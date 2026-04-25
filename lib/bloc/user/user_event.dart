@@ -11,6 +11,14 @@ class UserFetchRequested extends UserEvent {
   const UserFetchRequested();
 }
 
+class UserSearchRequested extends UserEvent {
+  final String query;
+  const UserSearchRequested({required this.query});
+
+  @override
+  List<Object?> get props => [query];
+}
+
 class UserAddRequested extends UserEvent {
   final String name;
   final String phoneNumber;

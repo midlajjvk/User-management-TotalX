@@ -12,6 +12,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
 
   UserBloc({required this.userService}) : super(const UserInitial()) {
     on<UserFetchRequested>(_onFetchRequested);
+    on<UserSearchRequested>(_onSearchRequested);
     on<UserAddRequested>(_onAddRequested);
   }
 
@@ -23,6 +24,23 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     try {
       final users = await userService.getUsers();
       emit(UserLoaded(users: users));
+    } catch (e) {
+      emit(UserFailure(message: e.toString().replaceAll('Exception: ', '')));
+    }
+  }
+
+  Future<void> _onSearchRequested(
+    UserSearchRequested event,
+    Emitter<UserState> emit,
+  ) async {
+    if (event.query.trim().isEmpty) {
+      add(const UserFetchRequested());
+      return;
+    }
+    emit(const UserSearching());
+    try {
+      final users = await userService.searchUsers(query: event.query.trim());
+      emit(UserSearchLoaded(users: users, query: event.query));
     } catch (e) {
       emit(UserFailure(message: e.toString().replaceAll('Exception: ', '')));
     }

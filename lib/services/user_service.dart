@@ -78,4 +78,34 @@ class UserService {
       throw Exception('Failed to fetch users: $e');
     }
   }
+
+  Future<List<UserModel>> searchUsers({required String query}) async {
+    try {
+      final lowerQuery = query.toLowerCase().trim();
+
+      final nameQuery = await _usersCollection
+          .where('nameLower', isGreaterThanOrEqualTo: lowerQuery)
+          .where('nameLower', isLessThan: '${lowerQuery}z')
+          .limit(20)
+          .get();
+
+      final phoneQuery = await _usersCollection
+          .where('phoneSearch', isGreaterThanOrEqualTo: query)
+          .where('phoneSearch', isLessThan: '${query}z')
+          .limit(20)
+          .get();
+
+      final Map<String, UserModel> resultsMap = {};
+      for (final doc in nameQuery.docs) {
+        resultsMap[doc.id] = UserModel.fromFirestore(doc);
+      }
+      for (final doc in phoneQuery.docs) {
+        resultsMap[doc.id] = UserModel.fromFirestore(doc);
+      }
+
+      return resultsMap.values.toList();
+    } catch (e) {
+      throw Exception('Search failed: $e');
+    }
+  }
 }

@@ -23,6 +23,19 @@ class UserLoaded extends UserState {
   List<Object?> get props => [users];
 }
 
+class UserSearching extends UserState {
+  const UserSearching();
+}
+
+class UserSearchLoaded extends UserState {
+  final List<UserModel> users;
+  final String query;
+  const UserSearchLoaded({required this.users, required this.query});
+
+  @override
+  List<Object?> get props => [users, query];
+}
+
 class UserAdding extends UserState {
   const UserAdding();
 }
