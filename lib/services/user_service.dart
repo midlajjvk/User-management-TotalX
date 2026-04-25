@@ -5,6 +5,12 @@ import 'package:uuid/uuid.dart';
 import 'package:totalx_app/models/user_model.dart';
 import 'package:totalx_app/utils/app_constants.dart';
 
+class UserResult {
+  final List<UserModel> users;
+  final List<DocumentSnapshot> docs;
+  const UserResult({required this.users, required this.docs});
+}
+
 class UserService {
   final FirebaseFirestore _firestore;
   final FirebaseStorage _storage;
@@ -68,12 +74,21 @@ class UserService {
     }
   }
 
-  Future<List<UserModel>> getUsers() async {
+  Future<UserResult> getUsers({DocumentSnapshot? lastDocument}) async {
     try {
-      final snapshot = await _usersCollection
+      Query query = _usersCollection
           .orderBy('createdAt', descending: true)
-          .get();
-      return snapshot.docs.map((doc) => UserModel.fromFirestore(doc)).toList();
+          .limit(AppConstants.pageSize);
+
+      if (lastDocument != null) {
+        query = query.startAfterDocument(lastDocument);
+      }
+
+      final snapshot = await query.get();
+      return UserResult(
+        users: snapshot.docs.map((doc) => UserModel.fromFirestore(doc)).toList(),
+        docs: snapshot.docs,
+      );
     } catch (e) {
       throw Exception('Failed to fetch users: $e');
     }
@@ -109,20 +124,31 @@ class UserService {
     }
   }
 
-  Future<List<UserModel>> getUsersByAgeCategory({required bool isOlder}) async {
+  Future<UserResult> getUsersByAgeCategory({
+    required bool isOlder,
+    DocumentSnapshot? lastDocument,
+  }) async {
     try {
       Query query;
       if (isOlder) {
         query = _usersCollection
             .where('age', isGreaterThan: 60)
-            .orderBy('age', descending: true);
+            .orderBy('age', descending: true)
+            .limit(AppConstants.pageSize);
       } else {
         query = _usersCollection
             .where('age', isLessThanOrEqualTo: 60)
-            .orderBy('age');
+            .orderBy('age')
+            .limit(AppConstants.pageSize);
+      }
+      if (lastDocument != null) {
+        query = query.startAfterDocument(lastDocument);
       }
       final snapshot = await query.get();
-      return snapshot.docs.map((doc) => UserModel.fromFirestore(doc)).toList();
+      return UserResult(
+        users: snapshot.docs.map((doc) => UserModel.fromFirestore(doc)).toList(),
+        docs: snapshot.docs,
+      );
     } catch (e) {
       throw Exception('Failed to fetch users by age: $e');
     }

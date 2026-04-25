@@ -20,10 +20,28 @@ class UserLoading extends UserState {
 class UserLoaded extends UserState {
   final List<UserModel> users;
   final SortCategory sortCategory;
-  const UserLoaded({required this.users, this.sortCategory = SortCategory.all});
+  final bool hasReachedMax;
+
+  const UserLoaded({
+    required this.users,
+    this.sortCategory = SortCategory.all,
+    this.hasReachedMax = false,
+  });
+
+  UserLoaded copyWith({
+    List<UserModel>? users,
+    SortCategory? sortCategory,
+    bool? hasReachedMax,
+  }) {
+    return UserLoaded(
+      users: users ?? this.users,
+      sortCategory: sortCategory ?? this.sortCategory,
+      hasReachedMax: hasReachedMax ?? this.hasReachedMax,
+    );
+  }
 
   @override
-  List<Object?> get props => [users, sortCategory];
+  List<Object?> get props => [users, sortCategory, hasReachedMax];
 }
 
 class UserSearching extends UserState {

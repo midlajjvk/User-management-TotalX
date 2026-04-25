@@ -11,6 +11,10 @@ class UserFetchRequested extends UserEvent {
   const UserFetchRequested();
 }
 
+class UserFetchMoreRequested extends UserEvent {
+  const UserFetchMoreRequested();
+}
+
 class UserSearchRequested extends UserEvent {
   final String query;
   const UserSearchRequested({required this.query});

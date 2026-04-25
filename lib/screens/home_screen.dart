@@ -16,11 +16,28 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _searchController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _scrollController.dispose();
     super.dispose();
+  }
+
+  void _onScroll() {
+    if (!_scrollController.hasClients) return;
+    final maxScroll = _scrollController.position.maxScrollExtent;
+    final currentScroll = _scrollController.offset;
+    if (currentScroll >= maxScroll * 0.9) {
+      context.read<UserBloc>().add(const UserFetchMoreRequested());
+    }
   }
 
   @override
@@ -156,7 +173,10 @@ class _HomeScreenState extends State<HomeScreen> {
       },
       builder: (context, state) {
         if (state is UserLoading || state is UserSearching) {
-          return const Center(child: CircularProgressIndicator());
+          return ListView.builder(
+            itemCount: 8,
+            itemBuilder: (_, __) => const UserTileShimmer(),
+          );
         }
 
         if (state is UserSearchLoaded) {
@@ -180,8 +200,21 @@ class _HomeScreenState extends State<HomeScreen> {
             );
           }
           return ListView.builder(
-            itemCount: state.users.length,
-            itemBuilder: (_, i) => UserTile(user: state.users[i]),
+            controller: _scrollController,
+            itemCount: state.hasReachedMax
+                ? state.users.length
+                : state.users.length + 1,
+            itemBuilder: (_, index) {
+              if (index >= state.users.length) {
+                return const Padding(
+                  padding: EdgeInsets.all(16),
+                  child: Center(
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                );
+              }
+              return UserTile(user: state.users[index]);
+            },
           );
         }
 
