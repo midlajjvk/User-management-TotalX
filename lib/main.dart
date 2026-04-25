@@ -1,15 +1,20 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:uuid/uuid.dart';
 
 import 'bloc/auth/auth_bloc.dart';
+import 'bloc/user/user_bloc.dart';
 import 'firebase_options.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
 import 'services/auth_service.dart';
+import 'services/user_service.dart';
 import 'utils/app_theme.dart';
 
 void main() async {
@@ -36,8 +41,22 @@ class TotalXApp extends StatelessWidget {
       googleSignIn: GoogleSignIn(),
     );
 
-    return BlocProvider(
-      create: (_) => AuthBloc(authService: authService),
+    final userService = UserService(
+      firestore: FirebaseFirestore.instance,
+      storage: FirebaseStorage.instance,
+      uuid: const Uuid(),
+    );
+
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (_) => AuthBloc(authService: authService),
+        ),
+        BlocProvider(
+          create: (_) =>
+              UserBloc(userService: userService)..add(const UserFetchRequested()),
+        ),
+      ],
       child: MaterialApp(
         title: 'TotalX',
         debugShowCheckedModeBanner: false,
