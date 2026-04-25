@@ -28,9 +28,7 @@ class LoginScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              const Spacer(),
-              _buildIllustration(),
-              const SizedBox(height: 20),
+              SizedBox(height: 100),
               const Text(
                 'Welcome',
                 style: TextStyle(
@@ -48,6 +46,9 @@ class LoginScreen extends StatelessWidget {
                   letterSpacing: 2,
                 ),
               ),
+             SizedBox(height: 50),
+              _buildIllustration(),
+              const SizedBox(height: 20),
               const Spacer(),
               BlocBuilder<AuthBloc, AuthState>(
                 builder: (context, state) {
@@ -231,7 +232,11 @@ class _GoogleSignInButton extends StatelessWidget {
             : Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _GoogleLogo(),
+                  Image.asset(
+                    'assets/images/googleicon.png',
+                    width: 22,
+                    height: 22,
+                  ),
                   const SizedBox(width: 12),
                   const Text(
                     'Continue With Google',
@@ -248,46 +253,3 @@ class _GoogleSignInButton extends StatelessWidget {
   }
 }
 
-class _GoogleLogo extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 22,
-      height: 22,
-      decoration: const BoxDecoration(shape: BoxShape.circle),
-      child: CustomPaint(painter: _GoogleLogoPainter()),
-    );
-  }
-}
-
-class _GoogleLogoPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final center = Offset(size.width / 2, size.height / 2);
-    final radius = size.width / 2;
-    final colors = [
-      const Color(0xFF4285F4),
-      const Color(0xFF34A853),
-      const Color(0xFFFBBC05),
-      const Color(0xFFEA4335),
-    ];
-    final paint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 3.5
-      ..strokeCap = StrokeCap.round;
-
-    for (int i = 0; i < 4; i++) {
-      paint.color = colors[i];
-      canvas.drawArc(
-        Rect.fromCircle(center: center, radius: radius - 1),
-        (i * 1.5708) - 0.3927,
-        1.1781,
-        false,
-        paint,
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}

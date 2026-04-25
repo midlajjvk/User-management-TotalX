@@ -37,13 +37,6 @@ class UserTile extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  user.phoneNumber,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: AppTheme.textSecondary,
-                  ),
-                ),
-                Text(
                   'Age: ${user.age}',
                   style: const TextStyle(
                     fontSize: 13,

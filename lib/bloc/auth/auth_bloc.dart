@@ -12,29 +12,32 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   StreamSubscription? _authSubscription;
 
   AuthBloc({required this.authService}) : super(const AuthInitial()) {
-    on<AuthCheckRequested>(_onAuthCheckRequested);
     on<AuthGoogleSignInRequested>(_onGoogleSignInRequested);
     on<AuthSignOutRequested>(_onSignOutRequested);
+    on<AuthUserChanged>(_onUserChanged);
+    on<AuthUserSignedOut>(_onUserSignedOut);
 
     _authSubscription = authService.authStateChanges.listen((user) {
       if (user != null) {
-        emit(AuthAuthenticated(user: user));
+        add(AuthUserChanged(user: user));
       } else {
-        emit(const AuthUnauthenticated());
+        add(const AuthUserSignedOut());
       }
     });
   }
 
-  Future<void> _onAuthCheckRequested(
-    AuthCheckRequested event,
+  Future<void> _onUserChanged(
+    AuthUserChanged event,
     Emitter<AuthState> emit,
   ) async {
-    final user = authService.getCurrentUser();
-    if (user != null) {
-      emit(AuthAuthenticated(user: user));
-    } else {
-      emit(const AuthUnauthenticated());
-    }
+    emit(AuthAuthenticated(user: event.user));
+  }
+
+  Future<void> _onUserSignedOut(
+    AuthUserSignedOut event,
+    Emitter<AuthState> emit,
+  ) async {
+    emit(const AuthUnauthenticated());
   }
 
   Future<void> _onGoogleSignInRequested(
