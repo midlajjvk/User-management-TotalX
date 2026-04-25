@@ -1,5 +1,7 @@
 part of 'user_bloc.dart';
 
+enum SortCategory { all, older, younger }
+
 abstract class UserState extends Equatable {
   const UserState();
 
@@ -17,10 +19,11 @@ class UserLoading extends UserState {
 
 class UserLoaded extends UserState {
   final List<UserModel> users;
-  const UserLoaded({required this.users});
+  final SortCategory sortCategory;
+  const UserLoaded({required this.users, this.sortCategory = SortCategory.all});
 
   @override
-  List<Object?> get props => [users];
+  List<Object?> get props => [users, sortCategory];
 }
 
 class UserSearching extends UserState {

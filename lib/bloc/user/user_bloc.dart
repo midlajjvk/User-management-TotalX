@@ -13,6 +13,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
   UserBloc({required this.userService}) : super(const UserInitial()) {
     on<UserFetchRequested>(_onFetchRequested);
     on<UserSearchRequested>(_onSearchRequested);
+    on<UserSortChanged>(_onSortChanged);
     on<UserAddRequested>(_onAddRequested);
   }
 
@@ -41,6 +42,26 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     try {
       final users = await userService.searchUsers(query: event.query.trim());
       emit(UserSearchLoaded(users: users, query: event.query));
+    } catch (e) {
+      emit(UserFailure(message: e.toString().replaceAll('Exception: ', '')));
+    }
+  }
+
+  Future<void> _onSortChanged(
+    UserSortChanged event,
+    Emitter<UserState> emit,
+  ) async {
+    emit(const UserLoading());
+    try {
+      if (event.category == SortCategory.all) {
+        final users = await userService.getUsers();
+        emit(UserLoaded(users: users, sortCategory: SortCategory.all));
+      } else {
+        final users = await userService.getUsersByAgeCategory(
+          isOlder: event.category == SortCategory.older,
+        );
+        emit(UserLoaded(users: users, sortCategory: event.category));
+      }
     } catch (e) {
       emit(UserFailure(message: e.toString().replaceAll('Exception: ', '')));
     }

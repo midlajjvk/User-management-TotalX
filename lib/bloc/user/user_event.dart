@@ -19,6 +19,14 @@ class UserSearchRequested extends UserEvent {
   List<Object?> get props => [query];
 }
 
+class UserSortChanged extends UserEvent {
+  final SortCategory category;
+  const UserSortChanged({required this.category});
+
+  @override
+  List<Object?> get props => [category];
+}
+
 class UserAddRequested extends UserEvent {
   final String name;
   final String phoneNumber;

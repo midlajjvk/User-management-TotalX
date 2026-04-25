@@ -4,6 +4,7 @@ import 'package:totalx_app/bloc/auth/auth_bloc.dart';
 import 'package:totalx_app/bloc/user/user_bloc.dart';
 import 'package:totalx_app/screens/add_user_screen.dart';
 import 'package:totalx_app/utils/app_theme.dart';
+import 'package:totalx_app/widgets/sort_bottom_sheet.dart';
 import 'package:totalx_app/widgets/user_tile.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -26,17 +27,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppTheme.backgroundColor,
-      appBar: AppBar(
-        title: const Text('Users List'),
-        actions: [
-          IconButton(
-            onPressed: () {
-              context.read<AuthBloc>().add(const AuthSignOutRequested());
-            },
-            icon: const Icon(Icons.logout),
-          ),
-        ],
-      ),
+      appBar: _buildAppBar(context),
       body: Column(
         children: [
           _buildSearchBar(context),
@@ -59,6 +50,69 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  AppBar _buildAppBar(BuildContext context) {
+    return AppBar(
+      title: const Text('Users List'),
+      actions: [
+        BlocBuilder<UserBloc, UserState>(
+          builder: (context, state) {
+            final currentCategory =
+                state is UserLoaded ? state.sortCategory : SortCategory.all;
+            return IconButton(
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(24)),
+                  ),
+                  builder: (_) => BlocProvider.value(
+                    value: context.read<UserBloc>(),
+                    child: SortBottomSheet(currentCategory: currentCategory),
+                  ),
+                );
+              },
+              icon: Stack(
+                children: [
+                  Container(
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(10),
+                      border: Border.all(color: AppTheme.dividerColor),
+                    ),
+                    child: const Icon(Icons.tune,
+                        size: 20, color: AppTheme.textPrimary),
+                  ),
+                  if (currentCategory != SortCategory.all)
+                    Positioned(
+                      top: 0,
+                      right: 0,
+                      child: Container(
+                        width: 10,
+                        height: 10,
+                        decoration: const BoxDecoration(
+                          color: AppTheme.primaryColor,
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            );
+          },
+        ),
+        IconButton(
+          onPressed: () =>
+              context.read<AuthBloc>().add(const AuthSignOutRequested()),
+          icon: const Icon(Icons.logout, size: 20),
+        ),
+        const SizedBox(width: 4),
+      ],
+    );
+  }
+
   Widget _buildSearchBar(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
@@ -69,7 +123,8 @@ class _HomeScreenState extends State<HomeScreen> {
         },
         decoration: InputDecoration(
           hintText: 'Search by name or phone',
-          prefixIcon: const Icon(Icons.search, color: AppTheme.textSecondary),
+          prefixIcon:
+              const Icon(Icons.search, color: AppTheme.textSecondary),
           suffixIcon: _searchController.text.isNotEmpty
               ? IconButton(
                   icon: const Icon(Icons.clear,

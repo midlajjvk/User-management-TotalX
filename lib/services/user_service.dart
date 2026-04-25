@@ -108,4 +108,23 @@ class UserService {
       throw Exception('Search failed: $e');
     }
   }
+
+  Future<List<UserModel>> getUsersByAgeCategory({required bool isOlder}) async {
+    try {
+      Query query;
+      if (isOlder) {
+        query = _usersCollection
+            .where('age', isGreaterThan: 60)
+            .orderBy('age', descending: true);
+      } else {
+        query = _usersCollection
+            .where('age', isLessThanOrEqualTo: 60)
+            .orderBy('age');
+      }
+      final snapshot = await query.get();
+      return snapshot.docs.map((doc) => UserModel.fromFirestore(doc)).toList();
+    } catch (e) {
+      throw Exception('Failed to fetch users by age: $e');
+    }
+  }
 }
