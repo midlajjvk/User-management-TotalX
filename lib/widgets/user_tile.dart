@@ -46,25 +46,7 @@ class UserTile extends StatelessWidget {
               ],
             ),
           ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-            decoration: BoxDecoration(
-              color: user.isOlder
-                  ? const Color(0xFFFFF3E0)
-                  : const Color(0xFFE8F5E9),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(
-              user.isOlder ? 'Older' : 'Younger',
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w600,
-                color: user.isOlder
-                    ? const Color(0xFFE65100)
-                    : const Color(0xFF2E7D32),
-              ),
-            ),
-          ),
+
         ],
       ),
     );

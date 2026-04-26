@@ -28,13 +28,13 @@ class LoginScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              SizedBox(height: 100),
+              const Spacer(),
               const Text(
                 'Welcome',
                 style: TextStyle(
-                  fontSize: 22,
+                  fontSize: 29,
                   fontWeight: FontWeight.w600,
-                  color: AppTheme.textPrimary,
+                  color: AppTheme.primaryColor,
                 ),
               ),
               const Text(
@@ -46,9 +46,12 @@ class LoginScreen extends StatelessWidget {
                   letterSpacing: 2,
                 ),
               ),
-             SizedBox(height: 50),
-              _buildIllustration(),
               const SizedBox(height: 20),
+              Image.asset(
+                'assets/images/loginimage.png',
+                width: double.infinity,
+                fit: BoxFit.contain,
+              ),
               const Spacer(),
               BlocBuilder<AuthBloc, AuthState>(
                 builder: (context, state) {
@@ -63,12 +66,25 @@ class LoginScreen extends StatelessWidget {
                 },
               ),
               const SizedBox(height: 16),
-              Text(
-                'By Continuing, I agree to TotalX\'s Terms and condition & privacy policy',
+              RichText(
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 11,
-                  color: AppTheme.textSecondary,
+                text: TextSpan(
+                  style: const TextStyle(
+                    fontSize: 11,
+                    color: AppTheme.textPrimary,
+                  ),
+                  children: const [
+                    TextSpan(text: 'By Continuing, I agree to TotalX\'s '),
+                    TextSpan(
+                      text: 'Terms and condition',
+                      style: TextStyle(color: AppTheme.primaryColor),
+                    ),
+                    TextSpan(text: ' & '),
+                    TextSpan(
+                      text: 'privacy policy',
+                      style: TextStyle(color: AppTheme.primaryColor),
+                    ),
+                  ],
                 ),
               ),
               const SizedBox(height: 32),
@@ -76,123 +92,6 @@ class LoginScreen extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildIllustration() {
-    return SizedBox(
-      height: 220,
-      child: Stack(
-        alignment: Alignment.center,
-        children: [
-          Container(
-            width: 220,
-            height: 200,
-            decoration: BoxDecoration(
-              color: const Color(0xFFE3F2FD),
-              borderRadius: BorderRadius.circular(120),
-            ),
-          ),
-          Positioned(
-            bottom: 20,
-            child: Container(
-              width: 80,
-              height: 130,
-              decoration: BoxDecoration(
-                color: AppTheme.primaryColor,
-                borderRadius: BorderRadius.circular(14),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppTheme.primaryColor.withOpacity(0.4),
-                    blurRadius: 20,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
-              child: const Center(
-                child: Icon(Icons.shopping_bag_outlined,
-                    color: Colors.white, size: 36),
-              ),
-            ),
-          ),
-          Positioned(
-            right: 20,
-            bottom: 30,
-            child: Container(
-              width: 90,
-              height: 55,
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF1565C0), Color(0xFF42A5F5)],
-                ),
-                borderRadius: BorderRadius.circular(10),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.15),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: const Padding(
-                padding: EdgeInsets.all(8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Icon(Icons.credit_card, color: Colors.white70, size: 16),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            right: 30,
-            top: 30,
-            child: Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: const Color(0xFFFFC107),
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.orange.withOpacity(0.3),
-                    blurRadius: 10,
-                  ),
-                ],
-              ),
-              child: const Center(
-                child: Text(
-                  '\$',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 20,
-                  ),
-                ),
-              ),
-            ),
-          ),
-          Positioned(left: 20, top: 40, child: _CheckBadge()),
-          Positioned(left: 30, top: 80, child: _CheckBadge()),
-        ],
-      ),
-    );
-  }
-}
-
-class _CheckBadge extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 28,
-      height: 28,
-      decoration: const BoxDecoration(
-        color: Color(0xFF4CAF50),
-        shape: BoxShape.circle,
-      ),
-      child: const Icon(Icons.check, color: Colors.white, size: 16),
     );
   }
 }
@@ -252,4 +151,3 @@ class _GoogleSignInButton extends StatelessWidget {
     );
   }
 }
-

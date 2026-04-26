@@ -48,6 +48,20 @@ class _HomeScreenState extends State<HomeScreen> {
       body: Column(
         children: [
           _buildSearchBar(context),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 8),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'User List',
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  color: AppTheme.textPrimary,
+                ),
+              ),
+            ),
+          ),
           Expanded(child: _buildUserList()),
         ],
       ),
@@ -61,7 +75,8 @@ class _HomeScreenState extends State<HomeScreen> {
             context.read<UserBloc>().add(const UserFetchRequested());
           }
         },
-        backgroundColor: AppTheme.primaryColor,
+        backgroundColor: Colors.black,
+        shape: const CircleBorder(),
         child: const Icon(Icons.add, color: Colors.white),
       ),
     );
@@ -69,38 +84,108 @@ class _HomeScreenState extends State<HomeScreen> {
 
   AppBar _buildAppBar(BuildContext context) {
     return AppBar(
-      title: const Text('Users List'),
+      backgroundColor: Colors.black,
+      title: const Row(
+        children: [
+          Icon(Icons.location_on, size: 18, color: Colors.white),
+          SizedBox(width: 4),
+          Text(
+            'Nilambur',
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
+          ),
+        ],
+      ),
       actions: [
-        BlocBuilder<UserBloc, UserState>(
-          builder: (context, state) {
-            final currentCategory =
-                state is UserLoaded ? state.sortCategory : SortCategory.all;
-            return IconButton(
-              onPressed: () {
-                showModalBottomSheet(
-                  context: context,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(24)),
-                  ),
-                  builder: (_) => BlocProvider.value(
-                    value: context.read<UserBloc>(),
-                    child: SortBottomSheet(currentCategory: currentCategory),
-                  ),
-                );
+        IconButton(
+          onPressed: () =>
+              context.read<AuthBloc>().add(const AuthSignOutRequested()),
+          icon: const Icon(Icons.logout, size: 20, color: Colors.white),
+        ),
+        const SizedBox(width: 4),
+      ],
+    );
+  }
+
+  Widget _buildSearchBar(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _searchController,
+              onChanged: (value) {
+                context.read<UserBloc>().add(UserSearchRequested(query: value));
               },
-              icon: Stack(
+              decoration: InputDecoration(
+                hintText: 'Search by name or phone',
+                prefixIcon:
+                    const Icon(Icons.search, color: AppTheme.textSecondary),
+                suffixIcon: _searchController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear,
+                            size: 18, color: AppTheme.textSecondary),
+                        onPressed: () {
+                          _searchController.clear();
+                          context
+                              .read<UserBloc>()
+                              .add(const UserSearchRequested(query: ''));
+                        },
+                      )
+                    : null,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: const BorderSide(color: AppTheme.dividerColor),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide: const BorderSide(color: AppTheme.dividerColor),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(30),
+                  borderSide:
+                      const BorderSide(color: AppTheme.primaryColor, width: 2),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          BlocBuilder<UserBloc, UserState>(
+            builder: (context, state) {
+              final currentCategory =
+                  state is UserLoaded ? state.sortCategory : SortCategory.all;
+              return Stack(
                 children: [
                   Container(
-                    width: 38,
-                    height: 38,
+                    width: 48,
+                    height: 48,
                     decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.black,
+                      borderRadius: BorderRadius.circular(30),
                       border: Border.all(color: AppTheme.dividerColor),
                     ),
-                    child: const Icon(Icons.tune,
-                        size: 20, color: AppTheme.textPrimary),
+                    child: IconButton(
+                      onPressed: () {
+                        showModalBottomSheet(
+                          context: context,
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: BorderRadius.vertical(
+                                top: Radius.circular(24)),
+                          ),
+                          builder: (_) => BlocProvider.value(
+                            value: context.read<UserBloc>(),
+                            child: SortBottomSheet(
+                                currentCategory: currentCategory),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.tune,
+                          size: 20, color: Colors.white),
+                    ),
                   ),
                   if (currentCategory != SortCategory.all)
                     Positioned(
@@ -116,45 +201,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                 ],
-              ),
-            );
-          },
-        ),
-        IconButton(
-          onPressed: () =>
-              context.read<AuthBloc>().add(const AuthSignOutRequested()),
-          icon: const Icon(Icons.logout, size: 20),
-        ),
-        const SizedBox(width: 4),
-      ],
-    );
-  }
-
-  Widget _buildSearchBar(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 12, 16, 8),
-      child: TextField(
-        controller: _searchController,
-        onChanged: (value) {
-          context.read<UserBloc>().add(UserSearchRequested(query: value));
-        },
-        decoration: InputDecoration(
-          hintText: 'Search by name or phone',
-          prefixIcon:
-              const Icon(Icons.search, color: AppTheme.textSecondary),
-          suffixIcon: _searchController.text.isNotEmpty
-              ? IconButton(
-                  icon: const Icon(Icons.clear,
-                      size: 18, color: AppTheme.textSecondary),
-                  onPressed: () {
-                    _searchController.clear();
-                    context
-                        .read<UserBloc>()
-                        .add(const UserSearchRequested(query: ''));
-                  },
-                )
-              : null,
-        ),
+              );
+            },
+          ),
+        ],
       ),
     );
   }
